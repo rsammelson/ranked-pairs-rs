@@ -1,0 +1,16 @@
+[package]
+name = "ranked-pairs"
+version = "0.0.1"
+edition = "2024"
+license = "MIT"
+categories = ["mathematics"]
+keywords = ["election", "voting", "tally", "ranked-pairs"]
+repository = "https://github.com/rsammelson/ranked-pairs-rs"
+description = """
+A ranked pairs (Tideman method) election tallying library.
+"""
+
+[dependencies]
+itertools = "0.14.0"
+range-set-blaze = "0.1.16"
+thiserror = "2.0.12"
