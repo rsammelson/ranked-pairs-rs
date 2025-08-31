@@ -70,7 +70,7 @@ fn check_ballots<B: AsRef<[u16]>>(ballots: &[B], candidates: u16) -> Result<(), 
         let ballot = ballot.as_ref();
 
         // tracker for what candidates have been seen in this ballot
-        let mut selections = range_set_blaze::RangeSetBlaze::new();
+        let mut selections = rangemap::RangeSet::new();
 
         for v in ballot {
             if *v >= candidates {
@@ -79,9 +79,12 @@ fn check_ballots<B: AsRef<[u16]>>(ballots: &[B], candidates: u16) -> Result<(), 
             }
 
             let v = usize::from(*v);
-            if !selections.insert(v) {
+            if selections.contains(&v) {
                 // duplicate candidate number
                 return Err(Error::InvalidBallot);
+            } else {
+                // insert the candidate
+                selections.insert(v..v + 1);
             }
         }
     }

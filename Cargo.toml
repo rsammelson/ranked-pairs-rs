@@ -1,6 +1,6 @@
 [package]
 name = "ranked-pairs"
-version = "0.0.1"
+version = "0.0.2-alpha"
 edition = "2024"
 license = "MIT"
 categories = ["mathematics"]
@@ -11,6 +11,6 @@ A ranked pairs (Tideman method) election tallying library.
 """
 
 [dependencies]
-itertools = "0.14.0"
-range-set-blaze = "0.1.16"
-thiserror = "2.0.12"
+itertools = "0.14"
+rangemap = "1.6"
+thiserror = "2"

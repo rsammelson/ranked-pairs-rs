@@ -29,11 +29,12 @@ impl AcyclicGraph {
     }
 
     pub fn roots(&self) -> impl Iterator<Item = u16> {
-        let mut elements = range_set_blaze::RangeSetBlaze::from_iter([0..=self.nodes - 1]);
+        #[allow(clippy::single_range_in_vec_init)]
+        let mut elements = rangemap::RangeSet::from([0..self.nodes]);
         for e in &self.edges {
-            elements.remove(e.1);
+            elements.remove(e.1..e.1 + 1);
         }
-        elements.into_iter()
+        elements.into_iter().flatten()
     }
 
     fn dfs(&self, start: u16) -> impl Iterator<Item = u16> {
