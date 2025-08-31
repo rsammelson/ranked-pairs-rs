@@ -30,9 +30,12 @@ impl AcyclicGraph {
 
     pub fn roots(&self) -> impl Iterator<Item = u16> {
         #[allow(clippy::single_range_in_vec_init)]
-        let mut elements = rangemap::RangeSet::from([0..self.nodes]);
-        for e in &self.edges {
-            elements.remove(e.1..e.1 + 1);
+        let mut elements = rangemap::RangeSet::new();
+        if self.nodes > 0 {
+            elements.insert(0..self.nodes);
+            for e in &self.edges {
+                elements.remove(e.1..e.1 + 1);
+            }
         }
         elements.into_iter().flatten()
     }

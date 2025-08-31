@@ -6,6 +6,11 @@ pub fn tabulate_pairwise_results<B: AsRef<[u16]>>(
 ) -> BTreeMap<usize, BTreeSet<(u16, u16)>> {
     let mut pairwise_results: BTreeMap<usize, BTreeSet<(u16, u16)>> = BTreeMap::new();
 
+    if candidates < 2 {
+        // there are no pairs
+        return pairwise_results;
+    }
+
     // iterate over each unique pairing
     for c1 in 0..candidates - 1 {
         for c2 in c1 + 1..candidates {
