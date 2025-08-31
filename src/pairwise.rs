@@ -1,14 +1,20 @@
 use std::collections::{BTreeMap, BTreeSet};
 
+use crate::Error;
+
 pub fn tabulate_pairwise_results<B: AsRef<[u16]>>(
-    ballots: &[B],
+    ballots: impl IntoIterator<Item = B> + Copy,
     candidates: u16,
-) -> BTreeMap<usize, BTreeSet<(u16, u16)>> {
+) -> Result<BTreeMap<usize, BTreeSet<(u16, u16)>>, Error> {
+    for ballot in ballots {
+        check_ballot(ballot.as_ref(), candidates)?;
+    }
+
     let mut pairwise_results: BTreeMap<usize, BTreeSet<(u16, u16)>> = BTreeMap::new();
 
     if candidates < 2 {
         // there are no pairs
-        return pairwise_results;
+        return Ok(pairwise_results);
     }
 
     // iterate over each unique pairing
@@ -37,10 +43,37 @@ pub fn tabulate_pairwise_results<B: AsRef<[u16]>>(
         }
     }
 
-    pairwise_results
+    Ok(pairwise_results)
 }
 
-fn count_pairwise_election<B: AsRef<[u16]>>(ballots: &[B], c1: u16, c2: u16) -> (usize, usize) {
+fn check_ballot(ballot: &[u16], candidates: u16) -> Result<(), Error> {
+    // tracker for what candidates have been seen in this ballot
+    let mut selections = rangemap::RangeSet::new();
+
+    for v in ballot {
+        if *v >= candidates {
+            // invalid candidate number
+            return Err(Error::InvalidCandidate);
+        }
+
+        let v = usize::from(*v);
+        if selections.contains(&v) {
+            // duplicate candidate number
+            return Err(Error::InvalidBallot);
+        } else {
+            // insert the candidate
+            selections.insert(v..v + 1);
+        }
+    }
+
+    Ok(())
+}
+
+fn count_pairwise_election<B: AsRef<[u16]>>(
+    ballots: impl IntoIterator<Item = B>,
+    c1: u16,
+    c2: u16,
+) -> (usize, usize) {
     let mut c1_wins = 0;
     let mut c2_wins = 0;
     for ballot in ballots {
@@ -91,9 +124,15 @@ mod test {
     }
 
     #[test]
+    fn errors() {
+        tabulate_pairwise_results([[1]], 1).unwrap_err();
+        tabulate_pairwise_results([[0, 1, 0]], 2).unwrap_err();
+    }
+
+    #[test]
     fn tideman_example_2() {
         assert_eq!(
-            tabulate_pairwise_results(&crate::test::tideman_example_2_ballots(), 5),
+            tabulate_pairwise_results(&crate::test::tideman_example_2_ballots(), 5).unwrap(),
             BTreeMap::from([
                 (18, BTreeSet::from([(0, 2), (1, 2)])),
                 (16, BTreeSet::from([(2, 3), (2, 4)])),
@@ -106,7 +145,7 @@ mod test {
     #[test]
     fn tideman_example_3() {
         assert_eq!(
-            tabulate_pairwise_results(&crate::test::tideman_example_3_ballots(), 3),
+            tabulate_pairwise_results(&crate::test::tideman_example_3_ballots(), 3).unwrap(),
             // this is not from the paper
             BTreeMap::from([
                 (3, BTreeSet::from([(0, 1)])),
@@ -118,7 +157,7 @@ mod test {
     #[test]
     fn tideman_example_4() {
         assert_eq!(
-            tabulate_pairwise_results(&crate::test::tideman_example_4_ballots(), 4),
+            tabulate_pairwise_results(&crate::test::tideman_example_4_ballots(), 4).unwrap(),
             BTreeMap::from([
                 (13, BTreeSet::from([(1, 2)])),
                 (9, BTreeSet::from([(0, 1)])),
@@ -131,7 +170,7 @@ mod test {
     #[test]
     fn tideman_example_5() {
         assert_eq!(
-            tabulate_pairwise_results(&crate::test::tideman_example_5_ballots(), 5),
+            tabulate_pairwise_results(&crate::test::tideman_example_5_ballots(), 5).unwrap(),
             BTreeMap::from([
                 (11, BTreeSet::from([(1, 2)])),
                 (9, BTreeSet::from([(0, 1)])),
@@ -146,7 +185,7 @@ mod test {
     #[test]
     fn tideman_example_6() {
         assert_eq!(
-            tabulate_pairwise_results(&crate::test::tideman_example_6_ballots(), 4),
+            tabulate_pairwise_results(&crate::test::tideman_example_6_ballots(), 4).unwrap(),
             BTreeMap::from([(
                 1,
                 BTreeSet::from([(0, 1), (1, 2), (1, 3), (2, 0), (2, 3), (3, 0)])

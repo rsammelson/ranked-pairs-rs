@@ -31,10 +31,12 @@ impl TabulatedData {
     /// # Errors
     /// An error will be returned if any ballot contains an invalid candidate number (`>= candidates`)
     /// or contains the same candidate more than once.
-    pub fn from_ballots<B: AsRef<[u16]>>(ballots: &[B], candidates: u16) -> Result<Self, Error> {
-        check_ballots(ballots, candidates)?;
+    pub fn from_ballots<B: AsRef<[u16]>>(
+        ballots: impl IntoIterator<Item = B> + Copy,
+        candidates: u16,
+    ) -> Result<Self, Error> {
         Ok(Self {
-            table: pairwise::tabulate_pairwise_results(ballots, candidates),
+            table: pairwise::tabulate_pairwise_results(ballots, candidates)?,
             candidates,
         })
     }
@@ -86,33 +88,6 @@ impl TabulatedData {
 /// This is a shortcut for [TabulatedData::from_ballots] followed by [TabulatedData::tally].
 pub fn tally<B: AsRef<[u16]>>(ballots: &[B], candidates: u16) -> Result<BTreeSet<u16>, Error> {
     TabulatedData::from_ballots(ballots, candidates).map(|d| d.tally())
-}
-
-fn check_ballots<B: AsRef<[u16]>>(ballots: &[B], candidates: u16) -> Result<(), Error> {
-    for ballot in ballots {
-        let ballot = ballot.as_ref();
-
-        // tracker for what candidates have been seen in this ballot
-        let mut selections = rangemap::RangeSet::new();
-
-        for v in ballot {
-            if *v >= candidates {
-                // invalid candidate number
-                return Err(Error::InvalidCandidate);
-            }
-
-            let v = usize::from(*v);
-            if selections.contains(&v) {
-                // duplicate candidate number
-                return Err(Error::InvalidBallot);
-            } else {
-                // insert the candidate
-                selections.insert(v..v + 1);
-            }
-        }
-    }
-
-    Ok(())
 }
 
 /// An error while tallying an election

@@ -1,6 +1,6 @@
 [package]
 name = "ranked-pairs"
-version = "0.0.2-alpha"
+version = "0.0.2-beta"
 edition = "2024"
 license = "MIT"
 categories = ["mathematics"]
