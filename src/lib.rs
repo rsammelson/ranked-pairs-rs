@@ -39,8 +39,6 @@ pub fn tally<B: AsRef<[u16]>>(ballots: &[B], candidates: u16) -> Result<BTreeSet
     // create a graph
     let mut graphs = HashSet::from([graph::AcyclicGraph::new(candidates)]);
 
-    println!("{pairwise_results:?}");
-
     // iterate over each group of equal-margin pairings, in order from largest margin of victory to
     // smallest (reverse of usual order)
     for pairings in pairwise_results.into_values().rev() {

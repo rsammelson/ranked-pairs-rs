@@ -86,15 +86,66 @@ mod test {
     }
 
     #[test]
-    fn tabulate() {
+    fn tideman_example_2() {
         assert_eq!(
-            tabulate_pairwise_results(BALLOTS, 6),
+            tabulate_pairwise_results(&crate::test::tideman_example_2_ballots(), 5),
             BTreeMap::from([
-                (4, BTreeSet::from([(1, 2), (1, 3), (1, 5)])),
-                (3, BTreeSet::from([(0, 3), (0, 5), (1, 4), (2, 3), (2, 5)])),
-                (2, BTreeSet::from([(1, 0), (0, 4), (2, 4)])),
-                (1, BTreeSet::from([(0, 2), (4, 3), (4, 5)])),
+                (18, BTreeSet::from([(0, 2), (1, 2)])),
+                (16, BTreeSet::from([(2, 3), (2, 4)])),
+                (14, BTreeSet::from([(3, 0), (3, 1), (4, 0), (4, 1)])),
+                (2, BTreeSet::from([(0, 1), (3, 4)])),
             ])
+        );
+    }
+
+    #[test]
+    fn tideman_example_3() {
+        assert_eq!(
+            tabulate_pairwise_results(&crate::test::tideman_example_3_ballots(), 3),
+            // this is not from the paper
+            BTreeMap::from([
+                (3, BTreeSet::from([(0, 1)])),
+                (1, BTreeSet::from([(2, 0), (2, 1)])),
+            ])
+        );
+    }
+
+    #[test]
+    fn tideman_example_4() {
+        assert_eq!(
+            tabulate_pairwise_results(&crate::test::tideman_example_4_ballots(), 4),
+            BTreeMap::from([
+                (13, BTreeSet::from([(1, 2)])),
+                (9, BTreeSet::from([(0, 1)])),
+                (5, BTreeSet::from([(2, 0)])),
+                (3, BTreeSet::from([(0, 3), (1, 3), (2, 3)])),
+            ])
+        );
+    }
+
+    #[test]
+    fn tideman_example_5() {
+        assert_eq!(
+            tabulate_pairwise_results(&crate::test::tideman_example_5_ballots(), 5),
+            BTreeMap::from([
+                (11, BTreeSet::from([(1, 2)])),
+                (9, BTreeSet::from([(0, 1)])),
+                (7, BTreeSet::from([(2, 0)])),
+                (5, BTreeSet::from([(3, 4)])),
+                (3, BTreeSet::from([(0, 3), (1, 3), (2, 3)])),
+                (1, BTreeSet::from([(4, 0), (4, 1), (4, 2)])),
+            ])
+        );
+    }
+
+    #[test]
+    fn tideman_example_6() {
+        assert_eq!(
+            tabulate_pairwise_results(&crate::test::tideman_example_6_ballots(), 4),
+            BTreeMap::from([(
+                1,
+                BTreeSet::from([(0, 1), (1, 2), (1, 3), (2, 0), (2, 3), (3, 0)])
+            )])
         );
     }
 }
